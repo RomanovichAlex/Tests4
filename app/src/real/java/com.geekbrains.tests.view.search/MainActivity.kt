@@ -66,13 +66,9 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
         })
     }
 
-    private fun createRepository(): RepositoryContract {
-        return if (BuildConfig.TYPE == FAKE) {
-            FakeGitHubRepository()
-        } else {
+    private fun createRepository(): RepositoryContract =
             GitHubRepository(createRetrofit().create(GitHubApi::class.java))
-        }
-    }
+
 
     private fun createRetrofit(): Retrofit {
         return Retrofit.Builder()
@@ -83,14 +79,14 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
 
     override fun displaySearchResults(
         searchResults: List<SearchResult>,
-        totalCount: Int
+        totalCount: Int,
     ) {
         with(totalCountTextView) {
             visibility = View.VISIBLE
             text =
-                String.format(Locale.getDefault(), getString(R.string.results_count), totalCount)
+                String.format(Locale.getDefault(), getString(R.string.results_count),
+                    totalCount)
         }
-
         this.totalCount = totalCount
         adapter.updateResults(searchResults)
     }
