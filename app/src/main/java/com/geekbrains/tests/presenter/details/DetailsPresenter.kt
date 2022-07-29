@@ -12,12 +12,12 @@ internal class DetailsPresenter internal constructor(
     }
 
     override fun onIncrement() {
-        count++
+        count ++
         viewContract.setCount(count)
     }
 
     override fun onDecrement() {
-        count--
+        count --
         viewContract.setCount(count)
     }
 }
