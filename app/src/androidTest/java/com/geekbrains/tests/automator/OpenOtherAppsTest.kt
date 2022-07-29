@@ -43,7 +43,7 @@ class OpenOtherAppsTest {
         //Приложений, обычно, установлено столько, что кнопка может быть за границей экрана
         //Тогда корневым контейнером будет Scrollable.
         //Если же все приложения умещаются на одном экране, то достаточно установить scrollable(false)
-        val appViews = UiScrollable(UiSelector().scrollable(true))
+        val appViews = UiScrollable(UiSelector().scrollable(false))
         //Если прокрутка горизонтальная (встречается на старых устройствах), нужно установить
         // горизонтальную прокрутку (по умолчанию она вертикальная)
         //appViews.setAsHorizontalList()
@@ -62,5 +62,35 @@ class OpenOtherAppsTest {
         val settingsValidation =
             uiDevice.findObject(UiSelector().packageName("com.android.settings"))
         Assert.assertTrue(settingsValidation.exists())
+    }
+
+
+    @Test
+    fun test_OpenDisplay() {
+        uiDevice.pressHome()
+
+        uiDevice.swipe(500, 1500, 500, 0, 5)
+        val appViews = UiScrollable(UiSelector().scrollable(false))
+        val settingsApp = appViews
+            .getChildByText(
+                UiSelector()
+                    .className(TextView::class.java.name),
+                "Settings"
+            )
+        //Открываем
+        settingsApp.clickAndWaitForNewWindow()
+
+        //Убеждаемся, что Настройки открыты
+        val settingsValidation =
+            uiDevice.findObject(UiSelector().packageName("com.android.settings"))
+        Assert.assertTrue(settingsValidation.exists())
+
+        val displayApp = appViews.getChildByText(
+            UiSelector()
+                .className(TextView::class.java.name),
+            "Display"
+        )
+        //Открываем
+        displayApp.clickAndWaitForNewWindow()
     }
 }

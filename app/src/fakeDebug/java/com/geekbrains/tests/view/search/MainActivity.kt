@@ -14,8 +14,6 @@ import com.geekbrains.tests.presenter.search.SearchPresenter
 import com.geekbrains.tests.repository.FakeGitHubRepository
 import com.geekbrains.tests.view.details.DetailsActivity
 import kotlinx.android.synthetic.main.activity_main.*
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
 
 class MainActivity : AppCompatActivity(), ViewSearchContract {
@@ -27,6 +25,7 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         setUI()
     }
 
@@ -34,6 +33,7 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
         toDetailsActivityButton.setOnClickListener {
             startActivity(DetailsActivity.getIntent(this, totalCount))
         }
+        setSearchListener()
         setQueryListener()
         setRecyclerView()
     }
@@ -41,6 +41,27 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
     private fun setRecyclerView() {
         recyclerView.setHasFixedSize(true)
         recyclerView.adapter = adapter
+    }
+
+    private fun setSearchListener() {
+        searchButton.setOnClickListener {
+            presenter.searchGitHub(searchButton.text.toString())
+        }
+    }
+
+    fun search(): Boolean {
+        val query = searchEditText.text.toString()
+        if (query.isNotBlank()) {
+            presenter.searchGitHub(query)
+            return true
+        } else {
+            Toast.makeText(
+                this@MainActivity,
+                getString(R.string.enter_search_word),
+                Toast.LENGTH_SHORT
+            ).show()
+            return false
+        }
     }
 
     private fun setQueryListener() {
@@ -63,23 +84,15 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
         })
     }
 
+
     private fun createRepository(): RepositoryContract =
-            FakeGitHubRepository()
-
-
-
-    private fun createRetrofit(): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
+        FakeGitHubRepository()
 
     override fun displaySearchResults(
         searchResults: List<SearchResult>,
         totalCount: Int
     ) {
-        with(totalCountTextView) {
+        with(totalCountTextViewMain) {
             visibility = View.VISIBLE
             text =
                 String.format(Locale.getDefault(), getString(R.string.results_count), totalCount)
@@ -103,10 +116,5 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
         } else {
             progressBar.visibility = View.GONE
         }
-    }
-
-    companion object {
-        const val BASE_URL = "https://api.github.com"
-        const val FAKE = "FAKE"
     }
 }
